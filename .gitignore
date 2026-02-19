@@ -1,0 +1,20 @@
+cat <<EOF > .gitignore
+# Entorno virtual
+env_ml/
+venv/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Datos pesados
+data/*.csv
+data/*.zip
+data/*.json
+EOF
