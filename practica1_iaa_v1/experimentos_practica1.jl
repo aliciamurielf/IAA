@@ -23,9 +23,9 @@ batch_fixed = 32
 n_epochs = 120
 
 alphas = Dict(
-    "A_alpha_slow" => 0.01,
-    "B_alpha_opt"  => 0.2,
-    "C_alpha_osc"  => 0.8,
+    "A_alpha_slow" => 0.00001,
+    "B_alpha_opt"  => 0.01,
+    "C_alpha_osc"  => 0.1,
     "D_alpha_fail" => 2.0
 )
 
