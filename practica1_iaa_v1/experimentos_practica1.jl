@@ -55,10 +55,10 @@ end
 
 # 4) Reto: criterio de parada (ejemplo)
 tol = 1e-5
-θ, history_loss, epochs_run = minibatch_gd(X_b, y; α=αopt, n_epochs=10_000, batch_size=32, tol=tol)
+θ, history_loss, epochs_run = minibatch_gd(X_b, y; α=αopt, n_epochs=10_000, batch_size=1, tol=tol)
 p = plot(history_loss,
-    title="Early stop (α=$αopt, batch=32, tol=$tol)",
+    title="Early stop (α=$αopt, batch=500, tol=$tol)",
     xlabel="Épocas", ylabel="Coste J(θ)", lw=2, legend=false)
-savefig(p, joinpath("outputs", "reto_early_stop.png"))
+savefig(p, joinpath("outputs", "reto_early_stop3.png"))
 
 println("Listo. Figuras generadas en outputs/")
