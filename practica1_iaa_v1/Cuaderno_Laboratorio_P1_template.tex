@@ -1,86 +1,248 @@
-% SUBIR ESTE CÓDIGO COMO CAPÍTULO DE PRÁCTICA EN LA MEMORIA DE PRACTICAS
-\chapter{Cuaderno de Laboratorio — Práctica 1: La Física del Aprendizaje Automático}
+\newcommand{\pregunta}[1]{%
+  \vspace{0.8em}
+  {\large\bfseries #1}
+  \vspace{0.4em}
+}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
 
-\section*{Objetivo}
-Comprender la dinámica de la optimización mediante gradiente descendente y el impacto de los hiperparámetros en la convergencia.
+\section{Práctica 1 — La Física del Aprendizaje Automático}
 
-\section{Tarea 1 — Importancia de la tasa de aprendizaje ($\alpha$)}
+% ============================================================
+\subsection{Objetivo}
 
-\subsection{Escenario A ($\alpha_{slow}$): convergencia lenta}
-Valor elegido: $\alpha =$ \underline{\hspace{2cm}}\\
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/alpha_A_alpha_slow_a0.01.png}
-\end{center}
-\textbf{Análisis:} ¿Por qué baja tan lentamente? ¿Cuántas iteraciones estimas para llegar cerca del mínimo?
+Comprender la dinámica de la optimización mediante gradiente descendente
+y el impacto de los hiperparámetros en la convergencia.
 
-\vspace{2.0cm}
+% ============================================================
+\subsection{Tarea 1 — Importancia de la tasa de aprendizaje ($\alpha$)}
 
-\subsection{Escenario B ($\alpha_{opt}$): “curva de codo”}
-Valor elegido: $\alpha =$ \underline{\hspace{2cm}}\\
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/alpha_B_alpha_opt_a0.2.png}
-\end{center}
-\textbf{Análisis:} Describe la “curva de codo” y qué te indica sobre rapidez y estabilidad.
+% ------------------------------------------------------------
+\subsubsection{Escenario A ($\alpha_{slow}$): convergencia lenta}
 
-\vspace{2.0cm}
+\textbf{Valor elegido:} $\alpha = 0.00001$
 
-\subsection{Escenario C ($\alpha_{osc}$): oscilación amortiguada}
-Valor elegido: $\alpha =$ \underline{\hspace{2cm}}\\
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/alpha_C_alpha_osc_a0.8.png}
-\end{center}
-\textbf{Análisis:} ¿Qué ocurre con $\theta$ en el espacio de búsqueda? ¿Por qué oscila y puede estabilizarse?
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{alpha_A_alpha_slow_a1.0e-5.png}
+\caption{Escenario A ($\alpha = 10^{-5}$).}
+\label{fig:escA}
+\end{figure}
 
-\vspace{2.0cm}
+\pregunta{\textquestiondown Por qué la curva baja tan lentamente?}
 
-\subsection{Escenario D ($\alpha_{fail}$): divergencia}
-Valor elegido: $\alpha =$ \underline{\hspace{2cm}}\\
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/alpha_D_alpha_fail_a2.0.png}
-\end{center}
-\textbf{Análisis:} ¿Por qué el error crece? Relaciónalo con “pasarse” del mínimo.
+La curva desciende muy lentamente porque la tasa de aprendizaje es
+extremadamente pequeña. Cada actualización de los parámetros realiza
+pasos muy cortos en la dirección del gradiente, lo que garantiza
+estabilidad pero ralentiza enormemente la convergencia.
 
-\newpage
-\section{Tarea 2 — Compromiso del mini-batch}
+\pregunta{\textquestiondown Cuántas iteraciones harían falta para llegar cerca del mínimo?}
 
-Usa tu $\alpha_{opt}$ y compara:
+Como podemos observar en la gráfica, el descenso total es de aproximadamente 1000 unidades de coste en 120 épocas.
+Previo al análisis de la pregunta planteada, es necesario realizar algunos cálculos:
 
-\subsection{Batch completo}
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/batch_Batch_completo_b500.png}
-\end{center}
+Para estimar el número de iteraciones necesarias, se calcula la pendiente
+aproximada del descenso del coste a partir de dos puntos de la gráfica:
 
-\subsection{Mini-batch (32 o 16)}
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/batch_Mini_batch_32_b32.png}
-\end{center}
+\begin{itemize}
+\item Época 0: coste $\approx 13650$
+\item Época 120: coste $\approx 12650$
+\end{itemize}
 
-\subsection{Estocástico puro (batch = 1)}
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/batch_Estocastico_1_b1.png}
-\end{center}
+La pendiente se calcula como:
+\[
+m = \frac{12650 - 13650}{120 - 0} \approx -8.33
+\]
 
-\textbf{Preguntas de reflexión:}
+Esto indica que el coste disminuye aproximadamente 8.33 unidades por
+época. 
+Suponiendo que el mínimo está cerca de 0, o en un valor considerablemente bajo, quedarían aproximadamente 12650 unidades de coste por reducir. Dividiendo la cantidad pendiente de reducción entre la pendiente, obtenemos las épocas adicionales requeridas:
+\[
+\text{Épocas restantes} = \frac{12650}{8.33} \approx 1518.6
+\]
+
+Sin embargo, en la práctica, el gradiente descendente se vuelve más lento a medida que se acerca al mínimo, por lo que la cifra real sería mucho mayor que lo anteriormente calculado. En consecuencia, llegamos a la conclusión de que harían falta miles de iteraciones (entre 2000 y 4000) para alcanzar dicho mínimo.
+
+% ------------------------------------------------------------
+\subsubsection{Escenario B ($\alpha_{opt}$): ``curva de codo''}
+
+\textbf{Valor elegido:} $\alpha = 0.01$
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{alpha_B_alpha_opt_a0.01.png}
+\caption{Escenario B ($\alpha = 0.01$).}
+\label{fig:escB}
+\end{figure}
+
+\subsubsection{Descripción de la curva de codo}
+
+La curva de codo se caracteriza por presentar tres fases claramente diferenciadas en la evolución del coste:
+
 \begin{enumerate}
-    \item ¿Cuál de las tres curvas es más “ruidosa” y por qué?
-    \item A nivel de tiempo de ejecución (CPU), ¿cuál ha sido más eficiente? Justifica basándote en computación vectorial.
+    \item \textbf{Descenso vertical al inicio:} el coste desciende rápidamente desde  un valor superior a 6000 acercandose el cero. Esta pendiente pronunciada forma la “parte superior del brazo”.
+    \item \textbf{Punto de inflexión (el “codo”):} entre la época 5 y 12 la curva cambia su trayectoria de forma significativa.
+    \item \textbf{Estabilidad:} a partir de la época 15, la curva se vuelve constante, indicando que el modelo ha convergido y el error deja de disminuir.
 \end{enumerate}
 
-\section{El reto — “Ajuste de precisión” (criterio de parada)}
+\subsubsection{\textquestiondown Qué te dice sobre estabilidad y rapidez?}
 
-Implementa el criterio:
+\textbf{Rapidez:} la curva muestra que la tasa de aprendizaje es lo suficientemente alta como para producir avances significativos en los pesos en pocas iteraciones. No presenta un descenso lento como en el Escenario A (véase Fig.~\ref{fig:escA}).
+
+\textbf{Estabilidad:} a diferencia del siguiente escenario(véase Fig.~\ref{fig:escB}), aquí el valor de $\alpha$ es lo bastante bajo como para permitir que el algoritmo descienda suavemente hacia el mínimo global. La línea plana posterior al “codo” indica ausencia de \textit{overshooting}, ya que los pesos permanecen en el punto óptimo sin oscilar.
+
+% ------------------------------------------------------------
+\subsubsection{Escenario C ($\alpha_{osc}$): oscilación amortiguada}
+
+\textbf{Valor elegido:} $\alpha = 0.1$
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{alpha_C_alpha_osc_a0.1.png}
+\caption{Escenario C $\alpha = 0.1$.}
+\label{fig:escC}
+\end{figure}
+
+\pregunta{\textquestiondown Qué está ocurriendo físicamente con los pesos del modelo en el espacio de búsqueda?\textquestiondown Por qué puede oscilar y aún así estabilizarse?}
+
+Al incrementar $\alpha$ a 0.1, podemos observar que el algoritmo alcanza inmediatamente la región cercana al mínimo,pero no logra estabilizarse y muestra oscilaciones en valores de coste inferiores a 25. Este comportamiento se debe a la magnitud de los pasos de actualización, los cuales provocan que los pesos sobrepasen el punto óptimo en cada iteración. Como consecuencia, el modelo oscila reiteradamente a ambos lados de la superficie de error. Aunque el error no diverge, como ocurre en el escenario D (véase Fig.~\ref{fig:escD}), estas oscilaciones impiden que el ajuste de los pesos llegue a la precisión máxima permitida por el dataset.
+
+El modelo se estabiliza porque el sistema encuentra un área de bajo error de la que no puede salir, pero continúa oscilando porque la tasa de aprendizaje le impide quedarse quieto en el punto exacto de convergencia.
+
+% ------------------------------------------------------------
+\subsubsection{Escenario D ($\alpha_{fail}$): divergencia}
+
+\textbf{Valor elegido:} $\alpha = 2.0$
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{alpha_D_alpha_fail_a2.0.png}
+\caption{Escenario D ($\alpha = 2.0$).}
+\label{fig:escD}
+\end{figure}
+
+\subsubsection{Causa del crecimiento del error}
+
+El error crece de manera descontrolada porque el valor de $\alpha$ supera el límite crítico de estabilidad del sistema. Esto provoca overshooting extremo, donde cada actualización de los pesos sitúa al modelo en una zona de mayor error que la anterior. Al ser la pendiente más pronunciada en esas zonas, los pasos se vuelven cada vez más grandes, provocando que el coste diverja hacia el infinito en lugar de converger al mínimo.
+
+% ============================================================
+\subsection{Tarea 2 — Compromiso del Mini-batch}
+
+Comparativa utilizando $\alpha = 0.01$.
+
+\begin{figure}[H]
+    \centering
+
+    \subsubsection{Batch completo}
+    
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{batch_Batch_completo_b500.png}
+        \caption{Curva de coste para batch completo}
+    \end{subfigure}
+
+    \vspace{0.5cm}
+
+    \subsubsection{Mini-batch (32)}
+
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{batch_Mini_batch_32_b32.png}
+        \caption{Curva de coste para mini-batch (32)}
+    \end{subfigure}
+
+    \caption{Comparación de estrategias de batch}
+\end{figure}
+
+\subsubsection{Estocástico puro (batch = 1)}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{batch_Estocastico_1_b1.png}
+\caption{Estocástico puro}
+\end{figure}
+
+\subsubsection{Preguntas de reflexión}
+
+\pregunta{\textquestiondown Cuál de las tres curvas es más ruidosa y por qué?}
+
+La curva más ruidosa es la del método estocástico puro (batch = 1), ya que actualiza los parámetros usando una sola muestra en cada iteración. Esto introduce una gran variabilidad en el gradiente y provoca oscilaciones frecuentes en el valor de la función de coste.
+
+\paragraph{A nivel de tiempo de ejecución (CPU), \textquestiondown cuál ha sido más eficiente?}
+
+El batch completo y el mini-batch son más eficientes a nivel de CPU, ya que permiten aprovechar la computación vectorial mediante operaciones con matrices. El método estocástico, al procesar una sola muestra por iteración, no puede beneficiarse de esta vectorización y requiere un mayor número de iteraciones.
+
+% ============================================================
+\section{El reto: Ajuste de precisión (criterio de parada)}
+
+Para este reto se ha modificado el script de entrenamiento para detener el proceso de optimización cuando la mejora entre épocas consecutivas es suficientemente pequeña, según el criterio:
 \[
 |J_t - J_{t-1}| < 10^{-5}
 \]
-Mejor combinación: $\alpha=$ \underline{\hspace{2cm}} \quad batch=\underline{\hspace{2cm}} \quad épocas=\underline{\hspace{2cm}}.
 
-\vspace{0.5cm}
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/reto_early_stop.png}
-\end{center}
+donde $J_t$ representa el valor de la función de coste en la época $t$.
 
+\textbf{Mejor combinación encontrada:} $\alpha = 0.01$, batch = 32  
+
+\textbf{Épocas hasta detenerse:} 76
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{reto_early_stop.png}
+\caption{Evolución del coste con criterio de parada temprana.}
+\end{figure}
+
+\subsection{Análisis del criterio de parada}
+
+Tras probar distintas combinaciones de tasa de aprendizaje y tamaño de batch, se observa que el mini-batch de 32 con $\alpha = 0.01$ es la configuración que alcanza antes el criterio de parada, lo que indica que el modelo deja de mejorar de forma significativa en menos épocas.
+
+La función de coste $J$ mide el error del modelo en cada época. Al evaluar la diferencia $|J_t - J_{t-1}|$, se mide la mejora real entre iteraciones consecutivas. Cuando esta diferencia es inferior al umbral establecido, el algoritmo interpreta que el aprendizaje ha dejado de ser significativo y detiene el entrenamiento.
+
+En la gráfica se observa que el error disminuye rápidamente al inicio, pero alrededor de la época 76 la pendiente se vuelve muy pequeña, lo que activa el criterio de parada.
+
+\subsection{Comparación con otras configuraciones de batch}
+
+El batch completo presenta una evolución muy estable, pero con un descenso más lento del error, lo que retrasa la activación del criterio de parada hasta aproximadamente la época 440.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{reto_early_stop2.png}
+\caption{Criterio de parada con batch completo.}
+\end{figure}
+
+El método estocástico puro introduce un elevado nivel de ruido debido a
+las actualizaciones con muestras individuales, lo que impide que el
+criterio de parada se active de forma consistente.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{reto_early_stop3.png}
+\caption{Comportamiento estocástico sin activación del criterio de parada.}
+\end{figure}
+
+\subsection{Coste del criterio de parada}
+
+El principal inconveniente al aplicar este criterio es no alcanzar el mínimo global absoluto de la función de coste $J(\theta)$. No obstante, las mejoras adicionales serían inferiores a $10^{-5}$ por iteración y resultan irrelevantes desde un punto de vista práctico.
+
+A cambio, se obtiene una mejora significativa en eficiencia computacional, reduciendo el tiempo de entrenamiento sin afectar de
+forma apreciable a la calidad final del modelo.
+
+% ============================================================
 \section{Conclusiones finales}
-Resume en 8--12 líneas lo aprendido sobre $\alpha$, tamaño de batch y criterio de parada.
 
-\vspace{3.0cm}
+Tras finalizar la práctica, llegamos a las siguientes conclusiones:
+
+En primer lugar, vemos que la tasa de aprendizaje es el parámetro más importante para garantizar la convergencia del modelo. Si dicha tasa tiene valores muy bajos, como en el Escenario A: $\alpha = 10^{-5}$ (véase Fig.~\ref{fig:escA}), asegura una trayectoria estable, pero aprende muy despacio. En cambio, valores altos generan inestabilidad, manifestándose en oscilaciones o en la divergencia total de la función de coste. Encontramos que el valor óptimo es $\alpha = 0.01$, ya que permite un buen equilibrio: un descenso rápido en las etapas iniciales y una estabilización gradual después.
+
+También analizamos la selección del \textit{batch}, y vimos que hay que buscar el equilibrio entre la velocidad de convergencia, la estabilidad del gradiente y la eficiencia computacional. Para entender mejor este equilibrio, comparamos los tres enfoques más habituales:
+
+\begin{itemize}
+    \item \textbf{Mini-batch}: es el método más equilibrado, ya que combina una convergencia rápida con una trayectoria estable, cumpliendo de manera efectiva los criterios de parada.
+    \item \textbf{Batch completo}: ofrece una alta estabilidad, pero a costa de una velocidad de convergencia considerablemente menor.
+    \item \textbf{Estocástico puro} (batch = 1): es el más inestable. Presenta constantes oscilaciones y una alta varianza al procesar muestras individuales, lo que dificulta la estabilización del error.
+\end{itemize}
+
+Además, comprobamos que el procesamiento completo y el \textit{mini-batch} resultan más eficientes en CPU. Esto se debe a que pueden aprovechar la computación vectorial y las operaciones matriciales optimizadas, a diferencia del método estocástico, que no puede beneficiarse de estas optimizaciones.
+
+Por último, aplicar un criterio de parada temprana basado en una mejora mínima del coste (umbral de $10^{-5}$) resultó ser una estrategia eficaz para optimizar recursos. Esta técnica evita el sobreajuste al detener el entrenamiento cuando las actualizaciones dejan de ser significativas, reduciendo iteraciones innecesarias y el tiempo de cómputo sin afectar a la calidad final del modelo.
 
