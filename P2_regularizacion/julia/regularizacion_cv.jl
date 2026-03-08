@@ -26,7 +26,7 @@ y = df.Precio
 # -----------------------
 metodo = "lasso"  # "lasso" o "ridge"
 λ = 1.0           # parámetro de regularización
-k = 10            # folds
+k = 2            # folds
 
 # -----------------------
 # 3) Modelo + Validación
