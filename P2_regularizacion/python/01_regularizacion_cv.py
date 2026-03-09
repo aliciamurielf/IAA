@@ -51,7 +51,7 @@ def main() -> None:
     # -----------------------
     metodo = "lasso"       # Opciones: "lasso" o "ridge"
     valor_lambda = 1.0     # Fuerza de la penalización (alpha en sklearn)
-    k_folds = 10
+    k_folds = 2
 
     # Consejo: en Lasso a veces necesitas subir max_iter si no converge
     if metodo == "lasso":
@@ -62,7 +62,7 @@ def main() -> None:
     # -----------------------
     # 3) Validación cruzada (K-Fold)
     # -----------------------
-    kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
+    kf = KFold(n_splits=k_folds, shuffle=True, random_state=None)
 
     # Scoring: sklearn devuelve MSE negativo (porque maximiza scores)
     scores = cross_val_score(modelo, X_std, y, cv=kf, scoring="neg_mean_squared_error")
