@@ -13,4 +13,4 @@ for seed in range(5):
     positivos = sum(y_test == 1)
     resultados.append({"ejecucion": seed+1, "positivos_test": positivos})
 
-pd.DataFrame(resultados).to_csv("../resultados/tarea1_resultados.csv", index=False)
+pd.DataFrame(resultados).to_csv("../outputs/tarea1_resultados.csv", index=False)

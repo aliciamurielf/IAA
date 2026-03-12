@@ -25,4 +25,4 @@ df_out = pd.DataFrame({
     "f1_std": [f1_kf.std(), f1_skf.std()]
 })
 
-df_out.to_csv("../resultados/tarea3_metricas.csv", index=False)
+df_out.to_csv("../outputs/tarea3_metricas.csv", index=False)

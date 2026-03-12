@@ -19,4 +19,4 @@ for fold, (_, test_idx) in enumerate(skf.split(X, y), start=1):
         "proporcion_clase1": proporcion
     })
 
-pd.DataFrame(rows).to_csv("../resultados/tarea2_folds.csv", index=False)
+pd.DataFrame(rows).to_csv("../outputs/tarea2_folds.csv", index=False)

@@ -35,4 +35,4 @@ df_out = pd.DataFrame({
     "f1": [f1_all.mean(), f1_clean.mean()]
 })
 
-df_out.to_csv("../resultados/tarea4_comparativa.csv", index=False)
+df_out.to_csv("../outputs/tarea4_comparativa.csv", index=False)
