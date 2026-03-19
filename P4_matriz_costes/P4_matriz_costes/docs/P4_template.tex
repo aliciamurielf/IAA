@@ -1,0 +1,221 @@
+% =========================================================
+% CAPÍTULO / SECCIÓN DE MEMORIA — PRÁCTICA 4
+% Clasificación y el Valor del Error (Matriz de Costes)
+% =========================================================
+
+\section{Práctica 4: Clasificación y el Valor del Error}
+
+\subsection{Objetivo de la práctica}
+En esta práctica se entrena un clasificador probabilístico sencillo para un problema de detección de fraude y se analiza cómo el umbral de decisión afecta a los errores y al coste total. El objetivo no es únicamente medir el rendimiento predictivo del modelo, sino estudiar el impacto real de sus decisiones a partir de una matriz de costes.
+
+\subsection{Descripción del problema}
+Se trabaja con un problema de clasificación binaria:
+\begin{itemize}
+    \item \textbf{Clase 0}: transacción normal.
+    \item \textbf{Clase 1}: transacción fraudulenta.
+\end{itemize}
+
+En este contexto, los errores no tienen el mismo coste:
+\begin{itemize}
+    \item \textbf{Falso Negativo (FN)}: no detectar un fraude \(\rightarrow 200\,€\)
+    \item \textbf{Falso Positivo (FP)}: bloquear una transacción legítima \(\rightarrow 10\,€\)
+\end{itemize}
+
+Por tanto, la decisión final no debe evaluarse solo por el número de aciertos, sino por el coste económico asociado a los errores.
+
+% ---------------------------------------------------------
+\subsection{Tarea 1: Análisis con el umbral por defecto (\(\tau = 0.5\))}
+% ---------------------------------------------------------
+
+\subsubsection{Modelo utilizado}
+En esta práctica se ha utilizado una \textbf{Regresión Logística} como clasificador base. El modelo se ha entrenado con el conjunto de entrenamiento y se ha evaluado sobre el conjunto de prueba.
+
+\subsubsection{Matriz de confusión}
+A continuación se muestra la matriz de confusión obtenida usando el umbral estándar \(\tau = 0.5\).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\textwidth]{img/matriz_confusion_umbral_0_5.png}
+    \caption{Matriz de confusión para el umbral \(\tau = 0.5\).}
+    \label{fig:mc_05}
+\end{figure}
+
+A partir de esta matriz, se obtienen los siguientes valores:
+\begin{itemize}
+    \item Verdaderos Positivos (TP): \texttt{[SUSTITUIR]}
+    \item Verdaderos Negativos (TN): \texttt{[SUSTITUIR]}
+    \item Falsos Positivos (FP): \texttt{[SUSTITUIR]}
+    \item Falsos Negativos (FN): \texttt{[SUSTITUIR]}
+\end{itemize}
+
+\subsubsection{Cálculo del coste total}
+El coste total se calcula mediante la expresión:
+\[
+\text{Coste Total} = (FP \cdot 10) + (FN \cdot 200)
+\]
+
+Sustituyendo los valores obtenidos:
+\[
+\text{Coste Total} = (\texttt{[FP]} \cdot 10) + (\texttt{[FN]} \cdot 200) = \texttt{[SUSTITUIR]} \,€
+\]
+
+\subsubsection{Interpretación}
+\textbf{Comentario del alumno:}  
+\textit{Explica aquí si el umbral por defecto de 0.5 parece razonable o no en este contexto. No te limites a decir si el modelo acierta mucho o poco; comenta especialmente si está controlando adecuadamente los errores más costosos.}
+
+\vspace{0.3cm}
+\noindent\textbf{Guía para redactar:}
+\begin{itemize}
+    \item ¿El modelo comete muchos falsos negativos?
+    \item ¿El coste total parece alto o bajo para este problema?
+    \item ¿Usarías este umbral en un entorno real sin revisarlo?
+\end{itemize}
+
+% ---------------------------------------------------------
+\subsection{Tarea 2: Estudio de probabilidades y umbrales}
+% ---------------------------------------------------------
+
+\subsubsection{Análisis de distintos umbrales}
+En lugar de trabajar únicamente con la clase predicha, se han utilizado las probabilidades estimadas por el modelo para la clase positiva y se han evaluado distintos valores del umbral \(\tau\) entre 0 y 1, en pasos de 0.05.
+
+La Tabla~\ref{tab:umbrales_coste} resume los resultados obtenidos para varios umbrales.
+
+\begin{table}[H]
+\centering
+\caption{Resumen de resultados para distintos umbrales.}
+\label{tab:umbrales_coste}
+\begin{tabular}{c c c c}
+\toprule
+\textbf{Umbral} & \textbf{FP} & \textbf{FN} & \textbf{Coste Total (€)} \\
+\midrule
+0.00 & \texttt{[ ]} & \texttt{[ ]} & \texttt{[ ]} \\
+0.05 & \texttt{[ ]} & \texttt{[ ]} & \texttt{[ ]} \\
+0.10 & \texttt{[ ]} & \texttt{[ ]} & \texttt{[ ]} \\
+0.15 & \texttt{[ ]} & \texttt{[ ]} & \texttt{[ ]} \\
+0.20 & \texttt{[ ]} & \texttt{[ ]} & \texttt{[ ]} \\
+\vdots & \vdots & \vdots & \vdots \\
+1.00 & \texttt{[ ]} & \texttt{[ ]} & \texttt{[ ]} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Observaciones}
+\textbf{Comentario del alumno:}  
+\textit{Describe aquí cómo cambian los falsos positivos y los falsos negativos al mover el umbral.}
+
+\vspace{0.3cm}
+\noindent\textbf{Guía para redactar:}
+\begin{itemize}
+    \item ¿Qué ocurre cuando el umbral baja?
+    \item ¿Qué ocurre cuando el umbral sube?
+    \item ¿Qué compromiso aparece entre FP y FN?
+\end{itemize}
+
+% ---------------------------------------------------------
+\subsection{Tarea 3: Optimización del coste}
+% ---------------------------------------------------------
+
+\subsubsection{Gráfica de coste frente a umbral}
+La Figura~\ref{fig:coste_umbral} muestra la evolución del coste total en función del umbral de decisión.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{img/coste_vs_umbral.png}
+    \caption{Coste total en función del umbral de decisión.}
+    \label{fig:coste_umbral}
+\end{figure}
+
+\subsubsection{Umbral óptimo}
+A partir de la gráfica y de la tabla anterior, el umbral que minimiza el coste total es:
+
+\[
+\tau^* = \texttt{[SUSTITUIR]}
+\]
+
+El coste total mínimo asociado es:
+
+\[
+\text{Coste mínimo} = \texttt{[SUSTITUIR]} \,€
+\]
+
+\subsubsection{Interpretación}
+\textbf{Comentario del alumno:}  
+\textit{Explica aquí si el umbral óptimo es mayor o menor que 0.5 y por qué ese valor tiene sentido en este problema.}
+
+\vspace{0.3cm}
+\noindent\textbf{Guía para redactar:}
+\begin{itemize}
+    \item ¿Por qué el mínimo no tiene por qué aparecer en 0.5?
+    \item ¿Qué relación tiene ese valor con la diferencia de costes entre FP y FN?
+    \item ¿Qué estrategia parece más razonable para el banco: conservadora o permisiva?
+\end{itemize}
+
+% ---------------------------------------------------------
+\subsection{Tarea 4: Curvas ROC y Precision-Recall}
+% ---------------------------------------------------------
+
+\subsubsection{Curva ROC}
+La Figura~\ref{fig:roc} muestra la curva ROC obtenida para el modelo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.58\textwidth]{img/curva_roc.png}
+    \caption{Curva ROC del clasificador.}
+    \label{fig:roc}
+\end{figure}
+
+\subsubsection{Curva Precision-Recall}
+La Figura~\ref{fig:pr} muestra la curva Precision-Recall del modelo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.58\textwidth]{img/curva_precision_recall.png}
+    \caption{Curva Precision-Recall del clasificador.}
+    \label{fig:pr}
+\end{figure}
+
+\subsubsection{Discusión}
+\textbf{Comentario del alumno:}  
+\textit{Si el dataset está desbalanceado, razona cuál de las dos curvas resulta más útil para valorar la utilidad real del modelo en este problema.}
+
+\vspace{0.3cm}
+\noindent\textbf{Guía para redactar:}
+\begin{itemize}
+    \item ¿Qué información aporta la curva ROC?
+    \item ¿Qué información aporta la curva Precision-Recall?
+    \item ¿Cuál refleja mejor el comportamiento sobre la clase minoritaria?
+\end{itemize}
+
+% ---------------------------------------------------------
+\subsection{Decisión final de ingeniería}
+% ---------------------------------------------------------
+
+Imaginando que formo parte del equipo técnico del banco, la política de decisión que recomendaría sería la siguiente:
+
+\begin{quote}
+\texttt{[REDACTAR AQUÍ UNA PROPUESTA BREVE Y ARGUMENTADA]}
+\end{quote}
+
+\noindent Esta decisión se basa en:
+\begin{itemize}
+    \item el coste asociado a los falsos positivos y falsos negativos;
+    \item el umbral que minimiza el coste total;
+    \item el equilibrio entre seguridad y molestias para el cliente;
+    \item la interpretación conjunta de las curvas ROC y Precision-Recall.
+\end{itemize}
+
+% ---------------------------------------------------------
+\subsection{Conclusiones}
+% ---------------------------------------------------------
+
+\textbf{Comentario final del alumno:}  
+\textit{Resume aquí qué has aprendido con esta práctica y explica por qué en clasificación no todos los errores valen lo mismo.}
+
+\vspace{0.3cm}
+\noindent\textbf{Aspectos que conviene mencionar:}
+\begin{itemize}
+    \item que el umbral de decisión no es fijo ni universal;
+    \item que cambiar el umbral modifica la relación entre FP y FN;
+    \item que el contexto del problema debe influir en la evaluación;
+    \item que una métrica general no siempre refleja el impacto real de un modelo.
+\end{itemize}
