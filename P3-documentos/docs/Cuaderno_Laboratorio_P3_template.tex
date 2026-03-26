@@ -86,27 +86,48 @@ Explica por qué \texttt{StratifiedKFold} es más adecuado que una partición al
 \hline
 Método & Accuracy media & std(Accuracy) & F1 media & std(F1) \\
 \hline
-KFold & \underline{\hspace{2cm}} & \underline{\hspace{2cm}} & \underline{\hspace{2cm}} & \underline{\hspace{2cm}} \\
-StratifiedKFold & \underline{\hspace{2cm}} & \underline{\hspace{2cm}} & \underline{\hspace{2cm}} & \underline{\hspace{2cm}} \\
+KFold & 0.991 & 0.016 & 0.800 & 0.310 \\
+StratifiedKFold & 0.997 & 0.002 & 0.914 & 0.070 \\
 \hline
 \end{tabular}
 \end{center}
 
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/tarea3_boxplot_accuracy.png}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{outputs/tarea3_accuracy_errorpoints.png}
+    \caption{Accuracy: media y desviación típica para KFold y StratifiedKFold.}
+    \label{fig:t3_accuracy}
+\end{figure}
 
-\begin{center}
-\includegraphics[width=0.85\linewidth]{outputs/tarea3_boxplot_f1.png}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{outputs/tarea3_f1_errorpoints.png}
+    \caption{F1-score: media y desviación típica para KFold y StratifiedKFold.}
+    \label{fig:t3_f1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{outputs/tarea3_std_barras.png}
+    \caption{Comparativa de desviación típica en Accuracy y F1 entre ambos métodos.}
+    \label{fig:t3_std}
+\end{figure}
+
+\vspace{0.6cm}
 
 \noindent\textbf{Interpretación:}
-\begin{itemize}
-    \item ¿Qué método produce métricas más estables?
-    \item ¿Dónde se nota más la mejora, en Accuracy o en F1?
-\end{itemize}
 
-\vspace{1.4cm}
+Las tres gráficas que hemos generado permiten ver de forma muy clara la diferencia de estabilidad entre KFold y StratifiedKFold. En un problema desbalanceado, una partición aleatoria puede generar folds con muy pocos ejemplos de la clase positiva, lo que hace que las métricas cambien mucho de una ejecución a otra. Cuando se mantiene la proporción de clases en cada fold, esta variabilidad desaparece casi por completo. Por eso, el método que produce métricas más estables es \textbf{StratifiedKFold}.
+
+En la gráfica de Accuracy (Figura~\ref{fig:t3_accuracy}) se aprecia que ambos métodos alcanzan valores altos, pero la dispersión de KFold es mayor. Esto indica que el rendimiento de KFold cambia según cómo se repartan los datos en cada fold. Aunque la diferencia en Accuracy no es muy grande, sí se nota que este método depende más del azar y que sus resultados son menos estables.
+
+En la gráfica del F1-score (Figura~\ref{fig:t3_f1}) la diferencia entre ambos métodos se aprecia todavía mejor. El F1 es una métrica muy sensible a cómo se reparten las clases, y por eso cualquier desequilibrio en los folds afecta mucho a su valor. En KFold se observa una variabilidad muy grande: en algunas ejecuciones el modelo detecta bien la clase positiva, y en otras prácticamente no la detecta. En cambio, StratifiedKFold mantiene valores de F1 más altos y, sobre todo, mucho más estables. Esto indica que la estratificación ofrece una evaluación más fiable y refleja mejor el comportamiento real del modelo.
+
+La gráfica comparativa de desviaciones típicas (Figura~\ref{fig:t3_std}) resume perfectamente esta idea: StratifiedKFold reduce la varianza tanto en Accuracy como en F1, pero la mejora es especialmente evidente en F1. Esto tiene sentido, porque F1 es la métrica que más sufre cuando la clase positiva aparece de forma irregular en los folds. Por tanto, \textbf{la mejora se nota mucho más en F1 que en Accuracy}.
+
+En resumen, las gráficas muestran que controlar la proporción de clases en cada fold no cambia el modelo, pero sí cambia la calidad de la evaluación, haciéndola más estable, más fiable y menos dependiente del azar.
+
+\vspace{0.2cm}
 
 \section{Tarea 4 — Detección de data leakage}
 
