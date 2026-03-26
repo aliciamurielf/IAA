@@ -2,7 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
-
+import numpy as np
+from sklearn.model_selection import StratifiedKFold
+from utils import cargar_dataset
 
 sns.set_style("whitegrid")
 
@@ -42,14 +44,12 @@ plt.close()
 
 
 # ============================
-# TAREA 3 — Boxplots Accuracy y F1
+# TAREA 3 — Accuracy y F1
 # ============================
 
 df3 = pd.read_csv("../outputs/tarea3_metricas.csv")
 
-# ----------------------------
 # 1. Accuracy — puntos con barras de error
-# ----------------------------
 plt.figure(figsize=(6,4))
 plt.errorbar(
     df3["metodo"],
@@ -68,9 +68,7 @@ plt.tight_layout()
 plt.savefig("../outputs/tarea3_accuracy_errorpoints.png")
 plt.close()
 
-# ----------------------------
 # 2. F1 — puntos con barras de error
-# ----------------------------
 plt.figure(figsize=(6,4))
 plt.errorbar(
     df3["metodo"],
@@ -89,9 +87,7 @@ plt.tight_layout()
 plt.savefig("../outputs/tarea3_f1_errorpoints.png")
 plt.close()
 
-# ----------------------------
 # 3. Gráfica de barras — desviaciones típicas
-# ----------------------------
 plt.figure(figsize=(6,4))
 plt.bar(
     df3["metodo"],
@@ -113,6 +109,80 @@ plt.legend()
 plt.tight_layout()
 plt.savefig("../outputs/tarea3_std_barras.png")
 plt.close()
+
+
+# ============================
+# TAREA 3 — Comparativa de modelos (Logistic vs Random Forest)
+# ============================
+
+df_log = pd.read_csv("../outputs/tarea3_logistic.csv")
+df_rf  = pd.read_csv("../outputs/tarea3_randomforest.csv")
+
+# Tomamos solo StratifiedKFold (fila 1)
+log_acc = df_log.loc[df_log["metodo"] == "StratifiedKFold", "accuracy_media"].values[0]
+rf_acc  = df_rf.loc[df_rf["metodo"] == "StratifiedKFold", "accuracy_media"].values[0]
+
+log_f1 = df_log.loc[df_log["metodo"] == "StratifiedKFold", "f1_media"].values[0]
+rf_f1  = df_rf.loc[df_rf["metodo"] == "StratifiedKFold", "f1_media"].values[0]
+
+# ----------------------------
+# 1. Accuracy comparativa
+# ----------------------------
+plt.figure(figsize=(6,4))
+plt.bar(["Logistic", "RandomForest"], [log_acc, rf_acc],
+        color=sns.color_palette("Blues", 3))
+plt.ylabel("Accuracy")
+plt.title("Comparativa de Accuracy (StratifiedKFold)")
+plt.tight_layout()
+plt.savefig("../outputs/tarea3_modelos_accuracy.png")
+plt.close()
+
+# ----------------------------
+# 2. F1 comparativa
+# ----------------------------
+plt.figure(figsize=(6,4))
+plt.bar(["Logistic", "RandomForest"], [log_f1, rf_f1],
+        color=sns.color_palette("Blues", 3))
+plt.ylabel("F1-score")
+plt.title("Comparativa de F1 (StratifiedKFold)")
+plt.tight_layout()
+plt.savefig("../outputs/tarea3_modelos_f1.png")
+plt.close()
+
+# ============================
+# TAREA 3 — Barras: positivos en train vs test
+# ============================
+
+df, X, y = cargar_dataset()
+
+# Eliminar variable trampa
+df = df.drop(columns=["ID_Hospital_Filtro"])
+X = df.drop(columns=["Clase"]).values
+y = df["Clase"].values
+
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+total_train = 0
+total_test = 0
+
+for train_idx, test_idx in skf.split(X, y):
+    total_train += np.sum(y[train_idx] == 1)
+    total_test += np.sum(y[test_idx] == 1)
+
+# Promedio por fold
+avg_train = total_train / 5
+avg_test = total_test / 5
+
+plt.figure(figsize=(6,4))
+plt.bar(["Train", "Test"], [avg_train, avg_test],
+        color=[sns.color_palette("Blues", 5)[3], sns.color_palette("Blues", 5)[1]])
+plt.ylabel("Número de positivos")
+plt.title("Comparación de positivos en Train vs Test (StratifiedKFold)")
+plt.tight_layout()
+plt.savefig("../outputs/tarea3_train_test_barras.png")
+plt.close()
+
+
 # ============================
 # TAREA 4 — Leakage
 # ============================
