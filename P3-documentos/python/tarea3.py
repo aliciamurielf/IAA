@@ -15,8 +15,8 @@ y = df["Clase"].values
 
 model = LogisticRegression(max_iter=200)
 
-kf = KFold(n_splits=5, shuffle=True, random_state=42)
-skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+kf = KFold(n_splits=10, shuffle=True, random_state=42)
+skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 
 accuracy_kf = cross_val_score(model, X, y, cv=kf, scoring="accuracy")
 accuracy_skf = cross_val_score(model, X, y, cv=skf, scoring="accuracy")
