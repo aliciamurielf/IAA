@@ -6,6 +6,13 @@ import pandas as pd
 
 df, X, y = cargar_dataset()
 
+# Eliminar variable trampa del DataFrame
+df = df.drop(columns=["ID_Hospital_Filtro"])
+
+# Reconstruir X sin la variable trampa
+X = df.drop(columns=["Clase"]).values
+y = df["Clase"].values
+
 model = LogisticRegression(max_iter=200)
 
 kf = KFold(n_splits=5, shuffle=True, random_state=42)
