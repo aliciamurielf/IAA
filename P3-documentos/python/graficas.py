@@ -125,29 +125,33 @@ rf_acc  = df_rf.loc[df_rf["metodo"] == "StratifiedKFold", "accuracy_media"].valu
 log_f1 = df_log.loc[df_log["metodo"] == "StratifiedKFold", "f1_media"].values[0]
 rf_f1  = df_rf.loc[df_rf["metodo"] == "StratifiedKFold", "f1_media"].values[0]
 
-# ----------------------------
-# 1. Accuracy comparativa
-# ----------------------------
-plt.figure(figsize=(6,4))
-plt.bar(["Logistic", "RandomForest"], [log_acc, rf_acc],
-        color=sns.color_palette("Blues", 3))
-plt.ylabel("Accuracy")
-plt.title("Comparativa de Accuracy (StratifiedKFold)")
+plt.figure(figsize=(7,5))
+
+x = np.arange(len(df3["metodo"]))  # posiciones: KFold, Stratified
+width = 0.35
+
+fig, ax = plt.subplots(figsize=(7,5))
+
+# Accuracy
+ax.bar(x - width/2, df3["accuracy_media"], width,
+       yerr=df3["accuracy_std"], capsize=6,
+       label="Accuracy", color=sns.color_palette("Blues", 5)[2])
+
+# F1
+ax.bar(x + width/2, df3["f1_media"], width,
+       yerr=df3["f1_std"], capsize=6,
+       label="F1-score", color=sns.color_palette("Blues", 5)[4])
+
+ax.set_xticks(x)
+ax.set_xticklabels(df3["metodo"])
+ax.set_ylabel("Valor de la métrica")
+ax.set_title("Comparación de Accuracy y F1 entre métodos de validación")
+ax.legend()
+
 plt.tight_layout()
-plt.savefig("../outputs/tarea3_modelos_accuracy.png")
+plt.savefig("../outputs/tarea3_metricas_agrupadas.png")
 plt.close()
 
-# ----------------------------
-# 2. F1 comparativa
-# ----------------------------
-plt.figure(figsize=(6,4))
-plt.bar(["Logistic", "RandomForest"], [log_f1, rf_f1],
-        color=sns.color_palette("Blues", 3))
-plt.ylabel("F1-score")
-plt.title("Comparativa de F1 (StratifiedKFold)")
-plt.tight_layout()
-plt.savefig("../outputs/tarea3_modelos_f1.png")
-plt.close()
 
 # ============================
 # TAREA 3 — Barras: positivos en train vs test
