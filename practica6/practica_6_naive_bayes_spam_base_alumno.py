@@ -54,13 +54,13 @@ def clean_text(text: str) -> str:
     text = str(text)
 
     # TODO: convertir a minúsculas
-    # text = ...
+    text = text.lower()
 
     # TODO: sustituir caracteres no alfanuméricos por espacios
-    # text = ...
+    text = re.sub(r'[^a-z0-9\s]', ' ', text)
 
     # TODO: eliminar espacios repetidos y recortar extremos
-    # text = ...
+    text = re.sub(r'\s+', ' ', text).strip()
 
     return text
 
@@ -81,7 +81,6 @@ def load_dataset(csv_path: str | Path) -> pd.DataFrame:
     if not csv_path.exists():
         raise FileNotFoundError(
             f"No se encontró el fichero: {csv_path.resolve()}\n"
-            "Asegúrate de que 'spam.csv' está en la misma carpeta que este script."
         )
 
     df = pd.read_csv(csv_path)
@@ -99,7 +98,7 @@ def load_dataset(csv_path: str | Path) -> pd.DataFrame:
     # ham -> 0
     # spam -> 1
     # Ejemplo orientativo:
-    # df["label_num"] = ...
+    df["label_num"] = df["Category"].map({"ham": 0, "spam": 1})
 
     return df
 
@@ -138,25 +137,21 @@ def prepare_data(df: pd.DataFrame):
         - Ajustar el vectorizador con train y transformar train/test.
     """
     # TODO: seleccionar mensajes y etiquetas
-    X = None
-    y = None
+    X = df["Message"]
+    y = df["label_num"]
 
     # TODO: dividir en train y test
     # Pista: usa test_size=0.25, random_state=42 y stratify=y
-    X_train = None
-    X_test = None
-    y_train = None
-    y_test = None
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y)
 
     # TODO: crear el vectorizador Bag of Words
-    vectorizer = None
+    vectorizer = CountVectorizer(preprocessor=clean_text)
 
     # TODO: generar la matriz documento-término de train y test
-    X_train_dtm = None
-    X_test_dtm = None
+    X_train_dtm = vectorizer.fit_transform(X_train)
+    X_test_dtm = vectorizer.transform(X_test)
 
     return X_train, X_test, y_train, y_test, vectorizer, X_train_dtm, X_test_dtm
-
 
 # ============================================================================
 # PARTE 4. ENTRENAMIENTO DEL MODELO
@@ -165,15 +160,11 @@ def prepare_data(df: pd.DataFrame):
 def train_model(X_train_dtm, y_train):
     """
     Entrena un modelo Multinomial Naïve Bayes.
-
-    TODO:
-        Crear el modelo con alpha=1.0 y ajustarlo con fit(...).
-
-    Pregunta para el informe:
-        ¿Por qué es importante usar alpha=1.0 en vez de dejar que una palabra
-        no observada provoque probabilidad cero?
     """
-    model = None
+    # TODO:
+    # Crear el modelo con alpha=1.0 y ajustarlo con fit(...).
+    model = MultinomialNB(alpha=1.0)
+    model.fit(X_train_dtm, y_train)
 
     return model
 
@@ -192,26 +183,26 @@ def evaluate_model(model, X_test_dtm, y_test, output_dir: str | Path | None = No
         - Calcular la matriz de confusión.
         - Guardar una imagen con la matriz de confusión.
     """
-    y_pred = None
+    y_pred = model.predict(X_test_dtm)
 
     print("\n" + "=" * 80)
     print("EVALUACIÓN DEL MODELO")
     print("=" * 80)
 
     # TODO: imprimir métricas de clasificación
-    # print(...)
+    print(classification_report(y_test, y_pred, target_names=["ham", "spam"]))
 
     # TODO: calcular la matriz de confusión
-    cm = None
+    cm = confusion_matrix(y_test, y_pred)
 
     print("\nMatriz de confusión:")
     print(cm)
 
     # TODO: representar la matriz con ConfusionMatrixDisplay
-    # disp = ...
-    # disp.plot(...)
-    # plt.title(...)
-    # plt.tight_layout()
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["ham", "spam"])
+    disp.plot(cmap=plt.cm.Blues)
+    plt.title("Matriz de Confusión")
+    plt.tight_layout()
 
     if output_dir is not None:
         output_dir = Path(output_dir)
@@ -219,7 +210,7 @@ def evaluate_model(model, X_test_dtm, y_test, output_dir: str | Path | None = No
         fig_path = output_dir / "matriz_confusion_spam_base.png"
 
         # TODO: guardar la figura
-        # plt.savefig(...)
+        plt.savefig(fig_path)
 
         print(f"\nFigura guardada en: {fig_path}")
 
@@ -247,22 +238,22 @@ def get_top_spam_words(model, vectorizer, top_n: int = 5) -> pd.DataFrame:
         más indicativa será esa palabra del spam.
     """
     # TODO: obtener el vocabulario
-    feature_names = None
+    feature_names = np.array(vectorizer.get_feature_names_out())
 
     # TODO: extraer las log-probabilidades para ham y spam
-    log_prob_ham = None
-    log_prob_spam = None
+    log_prob_ham = model.feature_log_prob_[0]
+    log_prob_spam = model.feature_log_prob_[1]
 
     # TODO: calcular una puntuación diferencial y ordenar
-    score = None
-    top_idx = None
+    score = log_prob_spam - log_prob_ham
+    top_idx = np.argsort(score)[::-1][:top_n]
 
     result = pd.DataFrame(
         {
-            "word": None,
-            "logP(word|spam)": None,
-            "logP(word|ham)": None,
-            "spam_minus_ham": None,
+            "word": feature_names[top_idx],
+            "logP(word|spam)": log_prob_spam[top_idx],
+            "logP(word|ham)": log_prob_ham[top_idx],
+            "spam_minus_ham": score[top_idx],
         }
     )
     return result
@@ -282,16 +273,16 @@ def classify_custom_messages(messages: list[str], model, vectorizer) -> pd.DataF
         - Obtener predict_proba.
         - Devolver una tabla clara con resultados.
     """
-    X_new = None
-    predicted_class = None
-    predicted_proba = None
+    X_new = vectorizer.transform(messages)
+    predicted_class = model.predict(X_new)
+    predicted_proba = model.predict_proba(X_new)
 
     results = pd.DataFrame(
         {
             "message": messages,
-            "predicted_label": None,
-            "P(ham)": None,
-            "P(spam)": None,
+            "predicted_label": ["spam" if label == 1 else "ham" for label in predicted_class],
+            "P(ham)": predicted_proba[:, 0],
+            "P(spam)": predicted_proba[:, 1],
         }
     )
     return results
@@ -303,7 +294,7 @@ def classify_custom_messages(messages: list[str], model, vectorizer) -> pd.DataF
 
 def main() -> None:
     """Ejecuta toda la práctica."""
-    csv_path = Path(__file__).with_name("spam.csv")
+    csv_path = Path(__file__).parent / "data" / "spam.csv"
 
     # 1. Cargar dataset
     df = load_dataset(csv_path)
@@ -326,7 +317,7 @@ def main() -> None:
     print("=" * 80)
 
     # TODO: mostrar el número de palabras distintas del vocabulario
-    # print(...)
+    print(f"Palabras distintas del vocabulario: {len(vectorizer.vocabulary_)}")
 
     # 4. Entrenar modelo
     model = train_model(X_train_dtm, y_train)
@@ -339,9 +330,12 @@ def main() -> None:
     # TODO:
     # Extraer model.class_log_prior_, pasarlo a probabilidad normal con np.exp(...)
     # e imprimir P(ham) y P(spam).
+    priors = np.exp(model.class_log_prior_)
+    print(f"P(ham): {priors[0]:.4f}")
+    print(f"P(spam): {priors[1]:.4f}")
 
     # 6. Evaluación
-    evaluate_model(model, X_test_dtm, y_test, output_dir=Path(__file__).parent)
+    evaluate_model(model, X_test_dtm, y_test, output_dir=Path(__file__).parent / "output")
 
     # 7. Palabras más asociadas al spam
     print("\n" + "=" * 80)
@@ -352,9 +346,9 @@ def main() -> None:
 
     # 8. Prueba con mensajes inventados
     custom_messages = [
-        "Hi, are we still meeting tomorrow at the library?",
-        "Congratulations! You have won a free vacation. Claim your prize now!",
-        "Hello, we have a special offer for you if you reply today.",
+        "Hey, let me know when you finish work so we can grab dinner.",
+        "URGENT! Your bank account has been locked. Click here to verify your details and claim a 1000$ cash prize.",
+        "Can you please review the attached document with the new business offer?",
     ]
 
     print("\n" + "=" * 80)
