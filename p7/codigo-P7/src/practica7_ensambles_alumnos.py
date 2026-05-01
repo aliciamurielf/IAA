@@ -338,6 +338,16 @@ def main() -> None:
     print("\nTop 3 variables más importantes en Random Forest:")
     print(show_top_features(rf_model, list(X.columns), top_k=3))
 
+    subarbol_rf = rf_model.estimators_[0]
+
+    # Usamos la función del profesor para dibujar este subárbol y guardarlo
+    plot_and_save_tree(
+        subarbol_rf, 
+        X.columns, 
+        os.path.join(output_dir, "subarbol_random_forest.png")
+    )
+    print("¡Gráfica del subárbol extraída y guardada en la carpeta output!")
+
     # -------------------------------------------------------------------------
     # PASO 4. BOOSTING
     # -------------------------------------------------------------------------
@@ -372,20 +382,20 @@ def main() -> None:
             {
                 "Modelo": "Árbol simple",
                 "Accuracy test": tree_results["test_accuracy"],
-                "Ventajas": "TODO",
-                "Desventajas": "TODO",
+                "Ventajas": "Alta interpretabilidad, entrenamiento rápido, bajo consumo memoria",
+                "Desventajas": "Alto sobreajuste, baja estabilidad, generalización pobre",
             },
             {
                 "Modelo": "Random Forest",
                 "Accuracy test": rf_model.score(X_test, y_test),
-                "Ventajas": "TODO",
-                "Desventajas": "TODO",
+                "Ventajas": "Reduce varianza, estable y robusto, buen rendimiento, menor sobreajuste",
+                "Desventajas": "Menos interpretable, entrenamiento más lento, mayor consumo memoria",
             },
             {
                 "Modelo": "Gradient Boosting",
                 "Accuracy test": gb_results["test_accuracy"],
-                "Ventajas": "TODO",
-                "Desventajas": "TODO",
+                "Ventajas": "Mejor rendimiento predictivo, maneja relaciones complejas",
+                "Desventajas": "Entrenamiento lento, riesgo de sobreajuste, baja interpretabilidad, alta complejidad",
             },
         ]
     )
