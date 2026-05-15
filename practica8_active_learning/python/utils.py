@@ -104,3 +104,27 @@ def plot_learning_curves(
     plt.tight_layout()
     plt.savefig(output_path, dpi=200)
     plt.show()
+
+def plot_decision_boundary(model, X, y, title, output_path):
+    """Representa la frontera de decisión del modelo y los puntos etiquetados."""
+    h = .02  # Tamaño del paso en la malla
+    x_min, x_max = X[:, 0].min() - 0.5, X[:, 0].max() + 0.5
+    y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+
+    # Predecir sobre la malla
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+
+    plt.figure(figsize=(8, 6))
+    # Dibujar la frontera (regiones de color)
+    plt.contourf(xx, yy, Z, cmap=plt.cm.RdBu, alpha=0.3)
+    # Dibujar los puntos que el modelo ya conoce (etiquetados)
+    plt.scatter(X[:, 0], X[:, 1], c=y, edgecolors='k', cmap=plt.cm.RdBu)
+    plt.title(title)
+    plt.xlabel("Característica 1 (x1)")
+    plt.ylabel("Característica 2 (x2)")
+    plt.savefig(output_path, dpi=150)
+    plt.show()
+    plt.close()

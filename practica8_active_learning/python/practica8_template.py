@@ -18,6 +18,7 @@ from utils import (
     load_data,
     plot_learning_curves,
     train_model,
+    plot_decision_boundary,
 )
 
 
@@ -85,6 +86,14 @@ def run_query_strategy(strategy: str) -> tuple[list[int], list[float]]:
     while len(y_train) <= MAX_LABELS:
         # TODO 1: entrena el modelo con X_train, y_train.
         model = train_model(X_train, y_train)
+        if len(y_train) == 10:
+            plot_decision_boundary(model, X_train, y_train, 
+                                 f"Frontera Inicial (10 etiquetas)", 
+                                 f"frontera_{strategy}_inicio.png")
+        elif len(y_train) == MAX_LABELS:
+            plot_decision_boundary(model, X_train, y_train, 
+                                 f"Frontera Final {strategy} ({MAX_LABELS} etiquetas)", 
+                                 f"frontera_{strategy}_final.png")
         # TODO 2: evalúa el modelo en X_test, y_test y guarda el accuracy.
         acc = accuracy(model, X_test, y_test)
         # TODO 3: guarda también el número actual de etiquetas.
